@@ -16,6 +16,11 @@
  */
 package com.mayekukhisa.scaffold
 
-fun main() {
-   println(App().name)
+import com.github.ajalt.clikt.core.subcommands
+import com.mayekukhisa.scaffold.command.Config
+
+fun main(args: Array<String>) {
+   App()
+      .subcommands(Config())
+      .main(args)
 }

@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
    application
    alias(libs.plugins.kotlin.jvm)
@@ -67,6 +69,7 @@ repositories {
 }
 
 dependencies {
+   implementation(libs.clikt)
    testImplementation(libs.kotlin.test)
 }
 
@@ -77,8 +80,39 @@ application {
    mainClass.set("${project.group}.MainKt")
 }
 
+val generatedSrcDir = layout.buildDirectory.dir("generated/src")
+
+sourceSets {
+   main {
+      kotlin.srcDir(generatedSrcDir)
+   }
+}
+
+val generateBuildConfig =
+   tasks.register("generateBuildConfig") {
+      doLast {
+         generatedSrcDir.map { it.file("${project.group}/BuildConfig.kt") }.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(
+               """
+               package ${project.group}
+
+               object BuildConfig {
+                 const val NAME = "${project.name}"
+                 const val VERSION = "${project.version}"
+               }
+               """.trimIndent(),
+            )
+         }
+      }
+   }
+
 tasks {
    named<Test>("test") {
       useJUnitPlatform()
+   }
+
+   named<KotlinCompile>("compileKotlin") {
+      dependsOn(generateBuildConfig)
    }
 }

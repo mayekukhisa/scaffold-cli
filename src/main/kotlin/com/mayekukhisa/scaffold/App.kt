@@ -16,9 +16,44 @@
  */
 package com.mayekukhisa.scaffold
 
-class App {
-   val name: String
-      get() {
-         return "scaffold"
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.versionOption
+import java.io.File
+import java.nio.file.Path
+import java.util.Properties
+
+class App : CliktCommand(
+   name = BuildConfig.NAME,
+   help = "A project structure generator tool",
+   epilog = "Homepage: https://github.com/mayekukhisa/scaffold#readme",
+   printHelpOnEmptyArgs = true,
+) {
+   init {
+      versionOption(BuildConfig.VERSION)
+   }
+
+   override fun run() = Unit
+
+   companion object {
+      val configFile: File by lazy {
+         val osName = System.getProperty("os.name").lowercase()
+         val userHome = System.getProperty("user.home")
+
+         val configPath =
+            when {
+               "win" in osName -> Path.of(userHome, "AppData", "Local", BuildConfig.NAME)
+               "mac" in osName -> Path.of(userHome, "Library", "Application Support", BuildConfig.NAME)
+               else -> Path.of(userHome, ".config", BuildConfig.NAME)
+            }
+
+         configPath.resolve("config.properties").toFile().apply {
+            if (!exists()) {
+               parentFile.mkdirs()
+               createNewFile()
+            }
+         }
       }
+
+      val config = Properties().apply { configFile.inputStream().use(::load) }
+   }
 }

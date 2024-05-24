@@ -1,12 +1,17 @@
 [versions]
+commons-io = "2.16.1"
 clikt = "4.4.0"
 kotlin = "1.9.24"
+kotlinx-serialization = "1.6.3"
 spotless = "6.25.0"
 
 [libraries]
+commons-io = { group = "commons-io", name = "commons-io", version.ref = "commons-io" }
 clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 [plugins]
 diffplug-spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

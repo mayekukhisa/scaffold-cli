@@ -17,7 +17,15 @@
 package com.mayekukhisa.scaffold
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.PrintMessage
+import com.github.ajalt.clikt.parameters.options.eagerOption
 import com.github.ajalt.clikt.parameters.options.versionOption
+import com.mayekukhisa.scaffold.model.Template
+import com.mayekukhisa.scaffold.model.TemplateCatalog
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.apache.commons.io.FileUtils
 import java.io.File
 import java.nio.file.Path
 import java.util.Properties
@@ -30,6 +38,15 @@ class App : CliktCommand(
 ) {
    init {
       versionOption(BuildConfig.VERSION)
+      eagerOption("--list-templates", help = "Show available templates and exit") {
+         throw PrintMessage(
+            if (templates.isEmpty()) {
+               "No templates found"
+            } else {
+               templates.joinToString(System.lineSeparator()) { it.name }
+            },
+         )
+      }
    }
 
    override fun run() = Unit
@@ -55,5 +72,36 @@ class App : CliktCommand(
       }
 
       val config = Properties().apply { configFile.inputStream().use(::load) }
+
+      val templates: List<Template> by lazy {
+         val templateCatalog =
+            config.getProperty("template.collection.path")
+               ?.let {
+                  File(it, "catalog.json").apply {
+                     if (!exists()) {
+                        FileUtils.writeStringToFile(
+                           this,
+                           Json.encodeToString(TemplateCatalog(emptyList())),
+                           Charsets.UTF_8,
+                        )
+                     }
+                  }
+               }
+               ?: throw PrintMessage(
+                  "Error: Template collection path not set",
+                  statusCode = 1,
+                  printError = true,
+               )
+
+         try {
+            with(Json { ignoreUnknownKeys = true }) {
+               decodeFromString<TemplateCatalog>(
+                  FileUtils.readFileToString(templateCatalog, Charsets.UTF_8),
+               ).templates
+            }
+         } catch (e: SerializationException) {
+            throw PrintMessage("Error: Invalid template catalog", statusCode = 1, printError = true)
+         }
+      }
    }
 }

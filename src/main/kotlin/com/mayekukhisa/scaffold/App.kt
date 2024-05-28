@@ -18,6 +18,8 @@ package com.mayekukhisa.scaffold
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintMessage
+import com.github.ajalt.clikt.core.context
+import com.github.ajalt.clikt.output.MordantHelpFormatter
 import com.github.ajalt.clikt.parameters.options.eagerOption
 import com.github.ajalt.clikt.parameters.options.versionOption
 import com.mayekukhisa.scaffold.model.Template
@@ -46,6 +48,10 @@ class App : CliktCommand(
                templates.joinToString(System.lineSeparator()) { it.name }
             },
          )
+      }
+
+      context {
+         helpFormatter = { MordantHelpFormatter(it, requiredOptionMarker = "*") }
       }
    }
 

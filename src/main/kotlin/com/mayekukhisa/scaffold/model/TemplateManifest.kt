@@ -14,14 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.mayekukhisa.scaffold
+package com.mayekukhisa.scaffold.model
 
-import com.github.ajalt.clikt.core.subcommands
-import com.mayekukhisa.scaffold.command.Config
-import com.mayekukhisa.scaffold.command.Create
+import kotlinx.serialization.Serializable
 
-fun main(args: Array<String>) {
-   App()
-      .subcommands(Config(), Create())
-      .main(args)
-}
+@Serializable
+data class TemplateManifest(
+   val textFiles: List<TemplateFile>,
+)

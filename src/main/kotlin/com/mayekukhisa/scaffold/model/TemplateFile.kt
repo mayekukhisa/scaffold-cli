@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.mayekukhisa.scaffold
+package com.mayekukhisa.scaffold.model
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlinx.serialization.Serializable
 
-class ExampleUnitTest {
-   @Test
-   fun `addition is correct`() {
-      assertEquals(4, 2 + 2)
-   }
-}
+@Serializable
+data class TemplateFile(
+   val sourcePath: String,
+   val targetPath: String,
+)

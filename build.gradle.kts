@@ -72,6 +72,7 @@ repositories {
 dependencies {
    implementation(libs.clikt)
    implementation(libs.commons.io)
+   implementation(libs.freemarker)
    implementation(libs.kotlinx.serialization.json)
    testImplementation(libs.kotlin.test)
 }

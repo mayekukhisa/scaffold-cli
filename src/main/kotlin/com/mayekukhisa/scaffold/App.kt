@@ -51,7 +51,7 @@ class App : CliktCommand(
       }
 
       context {
-         helpFormatter = { MordantHelpFormatter(it, requiredOptionMarker = "*") }
+         helpFormatter = { MordantHelpFormatter(it, requiredOptionMarker = "*", showDefaultValues = true) }
       }
    }
 

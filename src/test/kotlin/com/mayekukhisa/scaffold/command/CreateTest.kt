@@ -55,12 +55,19 @@ class CreateTest {
       checkProjectStructure(projectDir)
    }
 
+   @Test
+   fun `should create cli project`() {
+      val projectDir = tempDir.resolve("cli-project")
+      Create().parse(arrayOf("--template", "cli", "$projectDir"))
+      checkProjectStructure(projectDir)
+   }
+
    private fun checkProjectStructure(projectDir: File) {
       val bashPath = App.config.getProperty("bash.path") ?: error("Error: Bash path not set")
 
       val bashProcess =
          Runtime.getRuntime().exec(bashPath, null, projectDir).apply {
-            val command = "find . -type f -exec stat -c \"%n\" {} \\; | LC_ALL=C sort"
+            val command = "find . -type f -exec stat -c \"%a %n\" {} \\; | LC_ALL=C sort"
             outputStream.use { IOUtils.write(command, it, Charsets.UTF_8) }
             waitFor()
          }

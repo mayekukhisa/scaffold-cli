@@ -69,6 +69,13 @@ class CreateTest {
       checkProjectStructure(projectDir)
    }
 
+   @Test
+   fun `should create next project`() {
+      val projectDir = tempDir.resolve("next-project")
+      Create().parse(arrayOf("--template", "next", "$projectDir"))
+      checkProjectStructure(projectDir)
+   }
+
    private fun checkProjectStructure(projectDir: File) {
       val bashPath = App.config.getProperty("bash.path") ?: error("Error: Bash path not set")
 

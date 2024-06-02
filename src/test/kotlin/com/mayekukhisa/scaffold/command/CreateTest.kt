@@ -56,6 +56,13 @@ class CreateTest {
    }
 
    @Test
+   fun `should create android project`() {
+      val projectDir = tempDir.resolve("android-project")
+      Create().parse(arrayOf("--template", "android", "$projectDir"))
+      checkProjectStructure(projectDir)
+   }
+
+   @Test
    fun `should create cli project`() {
       val projectDir = tempDir.resolve("cli-project")
       Create().parse(arrayOf("--template", "cli", "$projectDir"))

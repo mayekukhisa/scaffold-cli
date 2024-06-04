@@ -119,4 +119,9 @@ tasks {
    named<KotlinCompile>("compileKotlin") {
       dependsOn(generateBuildConfig)
    }
+
+   named<Tar>("distTar") {
+      compression = Compression.GZIP
+      archiveExtension.set("tar.gz")
+   }
 }

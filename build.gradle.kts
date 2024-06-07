@@ -92,6 +92,16 @@ sourceSets {
    }
 }
 
+distributions {
+   main {
+      contents {
+         from(".") {
+            include("LICENSE", "NOTICE", "version.txt")
+         }
+      }
+   }
+}
+
 val generateBuildConfig =
    tasks.register("generateBuildConfig") {
       doLast {

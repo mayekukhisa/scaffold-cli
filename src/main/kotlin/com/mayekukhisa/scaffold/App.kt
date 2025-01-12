@@ -17,6 +17,7 @@
 package com.mayekukhisa.scaffold
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.PrintMessage
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.MordantHelpFormatter
@@ -25,19 +26,15 @@ import com.github.ajalt.clikt.parameters.options.versionOption
 import com.mayekukhisa.scaffold.model.Template
 import com.mayekukhisa.scaffold.model.TemplateCatalog
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.nio.file.Path
 import java.util.Properties
 
-class App : CliktCommand(
-  name = BuildConfig.NAME,
-  help = "A project structure generator tool",
-  epilog = "Homepage: https://github.com/mayekukhisa/scaffold#readme",
-  printHelpOnEmptyArgs = true,
-) {
+class App : CliktCommand(name = BuildConfig.NAME) {
+  override val printHelpOnEmptyArgs = true
+
   init {
     versionOption(BuildConfig.VERSION)
     eagerOption("--list-templates", help = "Show available templates and exit") {
@@ -54,6 +51,10 @@ class App : CliktCommand(
       helpFormatter = { MordantHelpFormatter(it, requiredOptionMarker = "*", showDefaultValues = true) }
     }
   }
+
+  override fun help(context: Context) = "A project structure generator tool"
+
+  override fun helpEpilog(context: Context) = "Homepage: https://github.com/mayekukhisa/scaffold#readme"
 
   override fun run() = Unit
 
@@ -81,7 +82,8 @@ class App : CliktCommand(
 
     val templates: List<Template> by lazy {
       val templateCatalog =
-        config.getProperty("template.collection.path")
+        config
+          .getProperty("template.collection.path")
           ?.let {
             File(it, "catalog.json").apply {
               if (!exists()) {

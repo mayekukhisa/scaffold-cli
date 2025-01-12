@@ -24,7 +24,7 @@ plugins {
 }
 
 kotlin {
-  jvmToolchain(17)
+  jvmToolchain(21)
 }
 
 spotless {
@@ -104,16 +104,20 @@ distributions {
 
 val generateBuildConfig =
   tasks.register("generateBuildConfig") {
+    val projectName = project.name
+    val projectGroup = project.group.toString()
+    val projectVersion = project.version.toString()
+
     doLast {
-      generatedSrcDir.map { it.file("${project.group}/BuildConfig.kt") }.get().asFile.apply {
+      generatedSrcDir.map { it.file("$projectGroup/BuildConfig.kt") }.get().asFile.apply {
         parentFile.mkdirs()
         writeText(
           """
-          package ${project.group}
+          package $projectGroup
 
           object BuildConfig {
-            const val NAME = "${project.name}"
-            const val VERSION = "${project.version}"
+            const val NAME = "$projectName"
+            const val VERSION = "$projectVersion"
           }
           """.trimIndent(),
         )

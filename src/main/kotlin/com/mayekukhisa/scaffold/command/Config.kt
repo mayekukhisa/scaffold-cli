@@ -17,6 +17,7 @@
 package com.mayekukhisa.scaffold.command
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.PrintMessage
 import com.github.ajalt.clikt.core.ProgramResult
 import com.github.ajalt.clikt.parameters.groups.mutuallyExclusiveOptions
@@ -27,10 +28,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.splitPair
 import com.mayekukhisa.scaffold.App
 
-class Config : CliktCommand(
-  help = "Manage tool configurations",
-  printHelpOnEmptyArgs = true,
-) {
+class Config : CliktCommand() {
+  override val printHelpOnEmptyArgs = true
+
   private val action by mutuallyExclusiveOptions(
     option(
       "--set",
@@ -61,6 +61,8 @@ class Config : CliktCommand(
     }
   }
 
+  override fun help(context: Context) = "Manage tool configurations"
+
   override fun run() {
     when (action) {
       is Action.Set -> {
@@ -87,10 +89,16 @@ class Config : CliktCommand(
   }
 
   private sealed class Action {
-    data class Set(val stringPair: Pair<String, String>) : Action()
+    data class Set(
+      val stringPair: Pair<String, String>,
+    ) : Action()
 
-    data class Get(val key: String) : Action()
+    data class Get(
+      val key: String,
+    ) : Action()
 
-    data class Unset(val key: String) : Action()
+    data class Unset(
+      val key: String,
+    ) : Action()
   }
 }

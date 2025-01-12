@@ -17,6 +17,7 @@
 package com.mayekukhisa.scaffold.command
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.PrintMessage
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.convert
@@ -41,17 +42,15 @@ import java.io.StringWriter
 import java.util.Locale
 import freemarker.template.Configuration as Freemarker
 
-class Create : CliktCommand(
-  help = "Generate a new project from a template",
-  printHelpOnEmptyArgs = true,
-) {
+class Create : CliktCommand() {
+  override val printHelpOnEmptyArgs = true
+
   private val projectTemplate by option(
     "-t",
     "--template",
     metavar = "name",
     help = "The name of the template to use. Use '${BuildConfig.NAME} --list-templates' to see available templates",
-  )
-    .convert { name -> App.templates.find { it.name == name } ?: fail(name) }
+  ).convert { name -> App.templates.find { it.name == name } ?: fail(name) }
     .required()
 
   private val projectName by option(
@@ -59,16 +58,14 @@ class Create : CliktCommand(
     "--name",
     metavar = "name",
     help = "The name to assign to the project",
-  )
-    .defaultLazy("project's directory name") { projectDir.name }
+  ).defaultLazy("project's directory name") { projectDir.name }
 
   private val packageName by option(
     "-p",
     "--package",
     metavar = "package",
     help = "The base package for the project",
-  )
-    .default("com.example")
+  ).default("com.example")
     .validate {
       if (!it.matches(Regex("^[a-z]+(\\.[a-z]+)*$"))) {
         fail("Invalid package")
@@ -78,19 +75,20 @@ class Create : CliktCommand(
   private val projectDir by argument(
     name = "directory",
     help = "The directory to create the project in",
-  )
-    .file()
+  ).file()
     .convert { File(it.canonicalPath) }
 
   private val templateCollectionDir by lazy { File(App.config.getProperty("template.collection.path")) }
 
   private val freemarker by lazy {
-    Freemarker(Freemarker.VERSION_2_3_32).apply {
+    Freemarker(Freemarker.VERSION_2_3_34).apply {
       setDirectoryForTemplateLoading(templateCollectionDir.resolve(projectTemplate.path))
       defaultEncoding = Charsets.UTF_8.name()
       locale = Locale.US
     }
   }
+
+  override fun help(context: Context) = "Generate a new project from a template"
 
   override fun run() {
     if (!projectDir.mkdirs()) {

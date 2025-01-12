@@ -16,6 +16,7 @@
  */
 package com.mayekukhisa.scaffold.command
 
+import com.github.ajalt.clikt.core.parse
 import com.mayekukhisa.scaffold.App
 import com.mayekukhisa.scaffold.BuildConfig
 import org.apache.commons.io.FileUtils
@@ -33,7 +34,8 @@ class CreateTest {
   private val testStdOut = ByteArrayOutputStream()
 
   private val tempDir =
-    FileUtils.getTempDirectory()
+    FileUtils
+      .getTempDirectory()
       .resolve("${BuildConfig.NAME}-test")
       .also { it.mkdir() }
 
@@ -87,7 +89,8 @@ class CreateTest {
       }
 
     val expectedStructure =
-      IOUtils.resourceToString("/project-structures/${projectDir.name}.txt", Charsets.UTF_8)
+      IOUtils
+        .resourceToString("/project-structures/${projectDir.name}.txt", Charsets.UTF_8)
         .replace("\r\n", "\n")
     assertEquals(expectedStructure, IOUtils.toString(bashProcess.inputStream, Charsets.UTF_8))
   }

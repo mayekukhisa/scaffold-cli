@@ -16,6 +16,7 @@
  */
 package com.mayekukhisa.scaffold
 
+import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.subcommands
 import com.mayekukhisa.scaffold.command.Config
 import com.mayekukhisa.scaffold.command.Create

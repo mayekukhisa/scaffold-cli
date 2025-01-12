@@ -4,7 +4,7 @@ Scaffold is a project structure generator tool that automates the setup of new p
 
 ## Key Features
 
--  **Project Generation**: Quickly create new projects using predefined templates.
+- **Project Generation**: Quickly create new projects using predefined templates.
 
 ## Getting Started
 
@@ -14,7 +14,7 @@ This section will guide you through setting up the tool on your local machine.
 
 Before running this tool, ensure the following software is installed on your system:
 
--  JRE or JDK 17, or newer. You can download the latest version from [Adoptium][1].
+- JRE or JDK 17, or newer. You can download the latest version from [Adoptium][1].
 
 ### Installation
 
@@ -27,29 +27,29 @@ Before running this tool, ensure the following software is installed on your sys
    <details>
    <summary>Windows</summary>
 
-   -  Right-click on "**This PC**" or "**My Computer**" and select "**Properties**".
+   - Right-click on "**This PC**" or "**My Computer**" and select "**Properties**".
 
-   -  Navigate to "**Advanced system settings**" &rarr; "**Advanced**" tab &rarr; "**Environment Variables**".
+   - Navigate to "**Advanced system settings**" &rarr; "**Advanced**" tab &rarr; "**Environment Variables**".
 
-   -  Under "**User variables**", locate the "**Path**" variable. If it doesn't exist, create it by clicking "**New**", naming it "**Path**", and setting its value.
+   - Under "**User variables**", locate the "**Path**" variable. If it doesn't exist, create it by clicking "**New**", naming it "**Path**", and setting its value.
 
-   -  If "**Path**" exists, select it and click "**Edit**" &rarr; "**New**", then add the absolute path to the `bin` directory of your extracted file.
+   - If "**Path**" exists, select it and click "**Edit**" &rarr; "**New**", then add the absolute path to the `bin` directory of your extracted file.
 
-   -  Click "**OK**" on each open window to save your changes.
+   - Click "**OK**" on each open window to save your changes.
    </details>
 
    <details>
    <summary>Linux and macOS</summary>
 
-   -  Add the following line to your `~/.bashrc` (for bash) or `~/.zshrc` (for zsh):
+   - Add the following line to your `~/.bashrc` (for bash) or `~/.zshrc` (for zsh):
 
-      ```shell
-      export PATH="$PATH:/path/to/bin"
-      ```
+     ```shell
+     export PATH="$PATH:/path/to/bin"
+     ```
 
-      Replace `/path/to/bin` with the absolute path to the `bin` directory of your extracted file.
+     Replace `/path/to/bin` with the absolute path to the `bin` directory of your extracted file.
 
-   -  Apply changes by running `source ~/.bashrc` (for bash) or `source ~/.zshrc` (for zsh). Alternatively, restart your terminal to apply the changes.
+   - Apply changes by running `source ~/.bashrc` (for bash) or `source ~/.zshrc` (for zsh). Alternatively, restart your terminal to apply the changes.
 
      </details>
 

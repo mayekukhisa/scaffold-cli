@@ -33,81 +33,81 @@ import java.nio.file.Path
 import java.util.Properties
 
 class App : CliktCommand(
-   name = BuildConfig.NAME,
-   help = "A project structure generator tool",
-   epilog = "Homepage: https://github.com/mayekukhisa/scaffold#readme",
-   printHelpOnEmptyArgs = true,
+  name = BuildConfig.NAME,
+  help = "A project structure generator tool",
+  epilog = "Homepage: https://github.com/mayekukhisa/scaffold#readme",
+  printHelpOnEmptyArgs = true,
 ) {
-   init {
-      versionOption(BuildConfig.VERSION)
-      eagerOption("--list-templates", help = "Show available templates and exit") {
-         throw PrintMessage(
-            if (templates.isEmpty()) {
-               "No templates found"
-            } else {
-               templates.joinToString(System.lineSeparator()) { it.name }
-            },
-         )
+  init {
+    versionOption(BuildConfig.VERSION)
+    eagerOption("--list-templates", help = "Show available templates and exit") {
+      throw PrintMessage(
+        if (templates.isEmpty()) {
+          "No templates found"
+        } else {
+          templates.joinToString(System.lineSeparator()) { it.name }
+        },
+      )
+    }
+
+    context {
+      helpFormatter = { MordantHelpFormatter(it, requiredOptionMarker = "*", showDefaultValues = true) }
+    }
+  }
+
+  override fun run() = Unit
+
+  companion object {
+    val configFile: File by lazy {
+      val osName = System.getProperty("os.name").lowercase()
+      val userHome = System.getProperty("user.home")
+
+      val configPath =
+        when {
+          "win" in osName -> Path.of(userHome, "AppData", "Local", BuildConfig.NAME)
+          "mac" in osName -> Path.of(userHome, "Library", "Application Support", BuildConfig.NAME)
+          else -> Path.of(userHome, ".config", BuildConfig.NAME)
+        }
+
+      configPath.resolve("config.properties").toFile().apply {
+        if (!exists()) {
+          parentFile.mkdirs()
+          createNewFile()
+        }
       }
+    }
 
-      context {
-         helpFormatter = { MordantHelpFormatter(it, requiredOptionMarker = "*", showDefaultValues = true) }
-      }
-   }
+    val config = Properties().apply { configFile.inputStream().use(::load) }
 
-   override fun run() = Unit
-
-   companion object {
-      val configFile: File by lazy {
-         val osName = System.getProperty("os.name").lowercase()
-         val userHome = System.getProperty("user.home")
-
-         val configPath =
-            when {
-               "win" in osName -> Path.of(userHome, "AppData", "Local", BuildConfig.NAME)
-               "mac" in osName -> Path.of(userHome, "Library", "Application Support", BuildConfig.NAME)
-               else -> Path.of(userHome, ".config", BuildConfig.NAME)
+    val templates: List<Template> by lazy {
+      val templateCatalog =
+        config.getProperty("template.collection.path")
+          ?.let {
+            File(it, "catalog.json").apply {
+              if (!exists()) {
+                FileUtils.writeStringToFile(
+                  this,
+                  Json.encodeToString(TemplateCatalog(emptyList())),
+                  Charsets.UTF_8,
+                )
+              }
             }
+          }
+          ?: throw PrintMessage(
+            "Error: Template collection path not set",
+            statusCode = 1,
+            printError = true,
+          )
 
-         configPath.resolve("config.properties").toFile().apply {
-            if (!exists()) {
-               parentFile.mkdirs()
-               createNewFile()
-            }
-         }
+      try {
+        with(Json { ignoreUnknownKeys = true }) {
+          decodeFromString<TemplateCatalog>(
+            FileUtils.readFileToString(templateCatalog, Charsets.UTF_8),
+          ).templates
+        }
+      } catch (e: SerializationException) {
+        throw PrintMessage("Error: Invalid template catalog", statusCode = 1, printError = true)
       }
-
-      val config = Properties().apply { configFile.inputStream().use(::load) }
-
-      val templates: List<Template> by lazy {
-         val templateCatalog =
-            config.getProperty("template.collection.path")
-               ?.let {
-                  File(it, "catalog.json").apply {
-                     if (!exists()) {
-                        FileUtils.writeStringToFile(
-                           this,
-                           Json.encodeToString(TemplateCatalog(emptyList())),
-                           Charsets.UTF_8,
-                        )
-                     }
-                  }
-               }
-               ?: throw PrintMessage(
-                  "Error: Template collection path not set",
-                  statusCode = 1,
-                  printError = true,
-               )
-
-         try {
-            with(Json { ignoreUnknownKeys = true }) {
-               decodeFromString<TemplateCatalog>(
-                  FileUtils.readFileToString(templateCatalog, Charsets.UTF_8),
-               ).templates
-            }
-         } catch (e: SerializationException) {
-            throw PrintMessage("Error: Invalid template catalog", statusCode = 1, printError = true)
-         }
-      }
-   }
+    }
+  }
 }

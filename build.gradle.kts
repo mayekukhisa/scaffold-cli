@@ -17,121 +17,121 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-   application
-   alias(libs.plugins.kotlin.jvm)
-   alias(libs.plugins.kotlin.serialization)
-   alias(libs.plugins.diffplug.spotless)
+  application
+  alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.diffplug.spotless)
 }
 
 kotlin {
-   jvmToolchain(17)
+  jvmToolchain(17)
 }
 
 spotless {
-   with(rootProject.file("spotless/kotlin-header.txt")) {
-      kotlin {
-         target("**/*.kt")
-         targetExclude("**/build/**/*.kt")
-         ktlint()
-         licenseHeaderFile(this@with).updateYearWithLatest(true)
-      }
+  with(rootProject.file("spotless/kotlin-header.txt")) {
+    kotlin {
+      target("**/*.kt")
+      targetExclude("**/build/**/*.kt")
+      ktlint()
+      licenseHeaderFile(this@with).updateYearWithLatest(true)
+    }
 
-      kotlinGradle {
-         target("**/*.kts")
-         targetExclude("**/build/**/*.kts")
-         ktlint()
-         licenseHeaderFile(this@with, "^(?![\\/ ]\\*).").updateYearWithLatest(true)
-      }
-   }
+    kotlinGradle {
+      target("**/*.kts")
+      targetExclude("**/build/**/*.kts")
+      ktlint()
+      licenseHeaderFile(this@with, "^(?![\\/ ]\\*).").updateYearWithLatest(true)
+    }
+  }
 
-   with(rootProject.file("spotless/prettier-config.json")) {
-      json {
-         target("**/*.json")
-         targetExclude("**/build/**/*.json")
-         prettier().configFile(this@with)
-      }
+  with(rootProject.file("spotless/prettier-config.json")) {
+    json {
+      target("**/*.json")
+      targetExclude("**/build/**/*.json")
+      prettier().configFile(this@with)
+    }
 
-      format("Markdown") {
-         target("**/*.md")
-         targetExclude("/CHANGELOG.md", "**/build/**/*.md")
-         prettier().configFile(this@with)
-      }
+    format("Markdown") {
+      target("**/*.md")
+      targetExclude("/CHANGELOG.md", "**/build/**/*.md")
+      prettier().configFile(this@with)
+    }
 
-      format("Yaml") {
-         target("**/*.yml")
-         targetExclude("**/build/**/*.yml")
-         prettier().configFile(this@with)
-      }
-   }
+    format("Yaml") {
+      target("**/*.yml")
+      targetExclude("**/build/**/*.yml")
+      prettier().configFile(this@with)
+    }
+  }
 }
 
 repositories {
-   mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-   implementation(libs.clikt)
-   implementation(libs.commons.io)
-   implementation(libs.freemarker)
-   implementation(libs.kotlinx.serialization.json)
-   testImplementation(libs.kotlin.test)
+  implementation(libs.clikt)
+  implementation(libs.commons.io)
+  implementation(libs.freemarker)
+  implementation(libs.kotlinx.serialization.json)
+  testImplementation(libs.kotlin.test)
 }
 
 group = "com.mayekukhisa.scaffold"
 version = rootProject.file("version.txt").readText().trim()
 
 application {
-   mainClass.set("${project.group}.MainKt")
+  mainClass.set("${project.group}.MainKt")
 }
 
 val generatedSrcDir = layout.buildDirectory.dir("generated/src")
 
 sourceSets {
-   main {
-      kotlin.srcDir(generatedSrcDir)
-   }
+  main {
+    kotlin.srcDir(generatedSrcDir)
+  }
 }
 
 distributions {
-   main {
-      contents {
-         from(".") {
-            include("LICENSE", "NOTICE", "version.txt")
-         }
+  main {
+    contents {
+      from(".") {
+        include("LICENSE", "NOTICE", "version.txt")
       }
-   }
+    }
+  }
 }
 
 val generateBuildConfig =
-   tasks.register("generateBuildConfig") {
-      doLast {
-         generatedSrcDir.map { it.file("${project.group}/BuildConfig.kt") }.get().asFile.apply {
-            parentFile.mkdirs()
-            writeText(
-               """
-               package ${project.group}
+  tasks.register("generateBuildConfig") {
+    doLast {
+      generatedSrcDir.map { it.file("${project.group}/BuildConfig.kt") }.get().asFile.apply {
+        parentFile.mkdirs()
+        writeText(
+          """
+          package ${project.group}
 
-               object BuildConfig {
-                 const val NAME = "${project.name}"
-                 const val VERSION = "${project.version}"
-               }
-               """.trimIndent(),
-            )
-         }
+          object BuildConfig {
+            const val NAME = "${project.name}"
+            const val VERSION = "${project.version}"
+          }
+          """.trimIndent(),
+        )
       }
-   }
+    }
+  }
 
 tasks {
-   named<Test>("test") {
-      useJUnitPlatform()
-   }
+  named<Test>("test") {
+    useJUnitPlatform()
+  }
 
-   named<KotlinCompile>("compileKotlin") {
-      dependsOn(generateBuildConfig)
-   }
+  named<KotlinCompile>("compileKotlin") {
+    dependsOn(generateBuildConfig)
+  }
 
-   named<Tar>("distTar") {
-      compression = Compression.GZIP
-      archiveExtension.set("tar.gz")
-   }
+  named<Tar>("distTar") {
+    compression = Compression.GZIP
+    archiveExtension.set("tar.gz")
+  }
 }

@@ -20,5 +20,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TemplateCatalog(
-   val templates: List<Template>,
+  val templates: List<Template>,
 )

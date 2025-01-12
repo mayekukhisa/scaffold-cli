@@ -42,129 +42,129 @@ import java.util.Locale
 import freemarker.template.Configuration as Freemarker
 
 class Create : CliktCommand(
-   help = "Generate a new project from a template",
-   printHelpOnEmptyArgs = true,
+  help = "Generate a new project from a template",
+  printHelpOnEmptyArgs = true,
 ) {
-   private val projectTemplate by option(
-      "-t",
-      "--template",
-      metavar = "name",
-      help = "The name of the template to use. Use '${BuildConfig.NAME} --list-templates' to see available templates",
-   )
-      .convert { name -> App.templates.find { it.name == name } ?: fail(name) }
-      .required()
+  private val projectTemplate by option(
+    "-t",
+    "--template",
+    metavar = "name",
+    help = "The name of the template to use. Use '${BuildConfig.NAME} --list-templates' to see available templates",
+  )
+    .convert { name -> App.templates.find { it.name == name } ?: fail(name) }
+    .required()
 
-   private val projectName by option(
-      "-n",
-      "--name",
-      metavar = "name",
-      help = "The name to assign to the project",
-   )
-      .defaultLazy("project's directory name") { projectDir.name }
+  private val projectName by option(
+    "-n",
+    "--name",
+    metavar = "name",
+    help = "The name to assign to the project",
+  )
+    .defaultLazy("project's directory name") { projectDir.name }
 
-   private val packageName by option(
-      "-p",
-      "--package",
-      metavar = "package",
-      help = "The base package for the project",
-   )
-      .default("com.example")
-      .validate {
-         if (!it.matches(Regex("^[a-z]+(\\.[a-z]+)*$"))) {
-            fail("Invalid package")
-         }
+  private val packageName by option(
+    "-p",
+    "--package",
+    metavar = "package",
+    help = "The base package for the project",
+  )
+    .default("com.example")
+    .validate {
+      if (!it.matches(Regex("^[a-z]+(\\.[a-z]+)*$"))) {
+        fail("Invalid package")
+      }
+    }
+
+  private val projectDir by argument(
+    name = "directory",
+    help = "The directory to create the project in",
+  )
+    .file()
+    .convert { File(it.canonicalPath) }
+
+  private val templateCollectionDir by lazy { File(App.config.getProperty("template.collection.path")) }
+
+  private val freemarker by lazy {
+    Freemarker(Freemarker.VERSION_2_3_32).apply {
+      setDirectoryForTemplateLoading(templateCollectionDir.resolve(projectTemplate.path))
+      defaultEncoding = Charsets.UTF_8.name()
+      locale = Locale.US
+    }
+  }
+
+  override fun run() {
+    if (!projectDir.mkdirs()) {
+      throw PrintMessage(
+        "Error: Failed to create project directory. File exists or permission denied",
+        statusCode = 1,
+        printError = true,
+      )
+    }
+
+    try {
+      with(Json { ignoreUnknownKeys = true }) {
+        val jsonString = freemarker.processTemplateFile("manifest.json")
+
+        decodeFromString<TemplateManifest>(jsonString).run {
+          echo("Generating project structure...")
+
+          binaryFiles.forEach { generateProjectFile(it) }
+          freemarkerFiles.forEach { generateProjectFile(it, preprocess = true) }
+          textFiles.forEach { generateProjectFile(it) }
+        }
+      }
+    } catch (e: IOException) {
+      abortProjectGeneration("Error: Template manifest not found")
+    } catch (e: SerializationException) {
+      abortProjectGeneration("Error: Invalid template manifest")
+    }
+
+    echo("Done!")
+  }
+
+  private fun Freemarker.processTemplateFile(filepath: String): String {
+    val dataModel =
+      mapOf(
+        "projectName" to projectName,
+        "packageName" to packageName,
+      )
+    return with(StringWriter()) {
+      getTemplate(filepath).process(dataModel, this)
+      toString()
+    }
+  }
+
+  private fun generateProjectFile(
+    templateFile: TemplateFile,
+    preprocess: Boolean = false,
+  ) {
+    try {
+      val outputFile = projectDir.resolve(templateFile.targetPath)
+
+      with(templateCollectionDir.resolve("${projectTemplate.path}/${templateFile.sourceRoot}")) {
+        if (preprocess) {
+          freemarker.setDirectoryForTemplateLoading(this)
+          FileUtils.writeStringToFile(
+            outputFile,
+            freemarker.processTemplateFile(templateFile.sourcePath),
+            Charsets.UTF_8,
+          )
+        } else {
+          FileUtils.copyFile(
+            resolve(templateFile.sourcePath),
+            outputFile,
+          )
+        }
       }
 
-   private val projectDir by argument(
-      name = "directory",
-      help = "The directory to create the project in",
-   )
-      .file()
-      .convert { File(it.canonicalPath) }
+      outputFile.setExecutable(templateFile.executable, false)
+    } catch (e: FileNotFoundException) {
+      abortProjectGeneration("Error: Template file '${templateFile.sourcePath}' not found")
+    }
+  }
 
-   private val templateCollectionDir by lazy { File(App.config.getProperty("template.collection.path")) }
-
-   private val freemarker by lazy {
-      Freemarker(Freemarker.VERSION_2_3_32).apply {
-         setDirectoryForTemplateLoading(templateCollectionDir.resolve(projectTemplate.path))
-         defaultEncoding = Charsets.UTF_8.name()
-         locale = Locale.US
-      }
-   }
-
-   override fun run() {
-      if (!projectDir.mkdirs()) {
-         throw PrintMessage(
-            "Error: Failed to create project directory. File exists or permission denied",
-            statusCode = 1,
-            printError = true,
-         )
-      }
-
-      try {
-         with(Json { ignoreUnknownKeys = true }) {
-            val jsonString = freemarker.processTemplateFile("manifest.json")
-
-            decodeFromString<TemplateManifest>(jsonString).run {
-               echo("Generating project structure...")
-
-               binaryFiles.forEach { generateProjectFile(it) }
-               freemarkerFiles.forEach { generateProjectFile(it, preprocess = true) }
-               textFiles.forEach { generateProjectFile(it) }
-            }
-         }
-      } catch (e: IOException) {
-         abortProjectGeneration("Error: Template manifest not found")
-      } catch (e: SerializationException) {
-         abortProjectGeneration("Error: Invalid template manifest")
-      }
-
-      echo("Done!")
-   }
-
-   private fun Freemarker.processTemplateFile(filepath: String): String {
-      val dataModel =
-         mapOf(
-            "projectName" to projectName,
-            "packageName" to packageName,
-         )
-      return with(StringWriter()) {
-         getTemplate(filepath).process(dataModel, this)
-         toString()
-      }
-   }
-
-   private fun generateProjectFile(
-      templateFile: TemplateFile,
-      preprocess: Boolean = false,
-   ) {
-      try {
-         val outputFile = projectDir.resolve(templateFile.targetPath)
-
-         with(templateCollectionDir.resolve("${projectTemplate.path}/${templateFile.sourceRoot}")) {
-            if (preprocess) {
-               freemarker.setDirectoryForTemplateLoading(this)
-               FileUtils.writeStringToFile(
-                  outputFile,
-                  freemarker.processTemplateFile(templateFile.sourcePath),
-                  Charsets.UTF_8,
-               )
-            } else {
-               FileUtils.copyFile(
-                  resolve(templateFile.sourcePath),
-                  outputFile,
-               )
-            }
-         }
-
-         outputFile.setExecutable(templateFile.executable, false)
-      } catch (e: FileNotFoundException) {
-         abortProjectGeneration("Error: Template file '${templateFile.sourcePath}' not found")
-      }
-   }
-
-   private fun abortProjectGeneration(errorMessage: String) {
-      FileUtils.deleteDirectory(projectDir)
-      throw PrintMessage(errorMessage, statusCode = 1, printError = true)
-   }
+  private fun abortProjectGeneration(errorMessage: String) {
+    FileUtils.deleteDirectory(projectDir)
+    throw PrintMessage(errorMessage, statusCode = 1, printError = true)
+  }
 }

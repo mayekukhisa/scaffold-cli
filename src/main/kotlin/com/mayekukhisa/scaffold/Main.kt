@@ -21,7 +21,7 @@ import com.mayekukhisa.scaffold.command.Config
 import com.mayekukhisa.scaffold.command.Create
 
 fun main(args: Array<String>) {
-   App()
-      .subcommands(Config(), Create())
-      .main(args)
+  App()
+    .subcommands(Config(), Create())
+    .main(args)
 }

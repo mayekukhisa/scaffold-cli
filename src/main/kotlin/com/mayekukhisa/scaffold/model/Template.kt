@@ -20,6 +20,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Template(
-   val name: String,
-   val path: String,
+  val name: String,
+  val path: String,
 )

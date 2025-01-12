@@ -28,69 +28,69 @@ import com.github.ajalt.clikt.parameters.options.splitPair
 import com.mayekukhisa.scaffold.App
 
 class Config : CliktCommand(
-   help = "Manage tool configurations",
-   printHelpOnEmptyArgs = true,
+  help = "Manage tool configurations",
+  printHelpOnEmptyArgs = true,
 ) {
-   private val action by mutuallyExclusiveOptions(
-      option(
-         "--set",
-         metavar = "key=value",
-         help = "Set the value for the specified key",
-      ).splitPair().convert { Action.Set(it) },
-      option(
-         "--get",
-         metavar = "key",
-         help = "Retrieve the value for the specified key",
-      ).convert { Action.Get(it) },
-      option(
-         "--unset",
-         metavar = "key",
-         help = "Remove the configuration entry matching the specified key",
-      ).convert { Action.Unset(it) },
-   ).single()
+  private val action by mutuallyExclusiveOptions(
+    option(
+      "--set",
+      metavar = "key=value",
+      help = "Set the value for the specified key",
+    ).splitPair().convert { Action.Set(it) },
+    option(
+      "--get",
+      metavar = "key",
+      help = "Retrieve the value for the specified key",
+    ).convert { Action.Get(it) },
+    option(
+      "--unset",
+      metavar = "key",
+      help = "Remove the configuration entry matching the specified key",
+    ).convert { Action.Unset(it) },
+  ).single()
 
-   init {
-      eagerOption("--list", help = "Show all configuration key/value pairs") {
-         throw PrintMessage(
-            if (App.config.isEmpty) {
-               "No configurations found"
-            } else {
-               App.config.entries.joinToString(System.lineSeparator()) { (key, value) -> "$key=$value" }
-            },
-         )
+  init {
+    eagerOption("--list", help = "Show all configuration key/value pairs") {
+      throw PrintMessage(
+        if (App.config.isEmpty) {
+          "No configurations found"
+        } else {
+          App.config.entries.joinToString(System.lineSeparator()) { (key, value) -> "$key=$value" }
+        },
+      )
+    }
+  }
+
+  override fun run() {
+    when (action) {
+      is Action.Set -> {
+        App.config.apply {
+          val stringPair = (action as Action.Set).stringPair
+          setProperty(stringPair.first, stringPair.second)
+          App.configFile.outputStream().use { store(it, null) }
+        }
       }
-   }
 
-   override fun run() {
-      when (action) {
-         is Action.Set -> {
-            App.config.apply {
-               val stringPair = (action as Action.Set).stringPair
-               setProperty(stringPair.first, stringPair.second)
-               App.configFile.outputStream().use { store(it, null) }
-            }
-         }
-
-         is Action.Get -> {
-            echo(App.config.getProperty((action as Action.Get).key) ?: throw ProgramResult(1))
-         }
-
-         is Action.Unset -> {
-            App.config.apply {
-               remove((action as Action.Unset).key)
-               App.configFile.outputStream().use { store(it, null) }
-            }
-         }
-
-         else -> throw ProgramResult(1) // This should never happen though
+      is Action.Get -> {
+        echo(App.config.getProperty((action as Action.Get).key) ?: throw ProgramResult(1))
       }
-   }
 
-   private sealed class Action {
-      data class Set(val stringPair: Pair<String, String>) : Action()
+      is Action.Unset -> {
+        App.config.apply {
+          remove((action as Action.Unset).key)
+          App.configFile.outputStream().use { store(it, null) }
+        }
+      }
 
-      data class Get(val key: String) : Action()
+      else -> throw ProgramResult(1) // This should never happen though
+    }
+  }
 
-      data class Unset(val key: String) : Action()
-   }
+  private sealed class Action {
+    data class Set(val stringPair: Pair<String, String>) : Action()
+
+    data class Get(val key: String) : Action()
+
+    data class Unset(val key: String) : Action()
+  }
 }

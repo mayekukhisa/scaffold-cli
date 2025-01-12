@@ -29,66 +29,66 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class CreateTest {
-   private val stdOut = System.out
-   private val testStdOut = ByteArrayOutputStream()
+  private val stdOut = System.out
+  private val testStdOut = ByteArrayOutputStream()
 
-   private val tempDir =
-      FileUtils.getTempDirectory()
-         .resolve("${BuildConfig.NAME}-test")
-         .also { it.mkdir() }
+  private val tempDir =
+    FileUtils.getTempDirectory()
+      .resolve("${BuildConfig.NAME}-test")
+      .also { it.mkdir() }
 
-   @BeforeTest
-   fun setUp() {
-      System.setOut(PrintStream(testStdOut))
-   }
+  @BeforeTest
+  fun setUp() {
+    System.setOut(PrintStream(testStdOut))
+  }
 
-   @AfterTest
-   fun tearDown() {
-      System.setOut(stdOut)
-      FileUtils.cleanDirectory(tempDir)
-   }
+  @AfterTest
+  fun tearDown() {
+    System.setOut(stdOut)
+    FileUtils.cleanDirectory(tempDir)
+  }
 
-   @Test
-   fun `should create blank project`() {
-      val projectDir = tempDir.resolve("blank-project")
-      Create().parse(arrayOf("--template", "blank", "$projectDir"))
-      checkProjectStructure(projectDir)
-   }
+  @Test
+  fun `should create blank project`() {
+    val projectDir = tempDir.resolve("blank-project")
+    Create().parse(arrayOf("--template", "blank", "$projectDir"))
+    checkProjectStructure(projectDir)
+  }
 
-   @Test
-   fun `should create android project`() {
-      val projectDir = tempDir.resolve("android-project")
-      Create().parse(arrayOf("--template", "android", "$projectDir"))
-      checkProjectStructure(projectDir)
-   }
+  @Test
+  fun `should create android project`() {
+    val projectDir = tempDir.resolve("android-project")
+    Create().parse(arrayOf("--template", "android", "$projectDir"))
+    checkProjectStructure(projectDir)
+  }
 
-   @Test
-   fun `should create cli project`() {
-      val projectDir = tempDir.resolve("cli-project")
-      Create().parse(arrayOf("--template", "cli", "$projectDir"))
-      checkProjectStructure(projectDir)
-   }
+  @Test
+  fun `should create cli project`() {
+    val projectDir = tempDir.resolve("cli-project")
+    Create().parse(arrayOf("--template", "cli", "$projectDir"))
+    checkProjectStructure(projectDir)
+  }
 
-   @Test
-   fun `should create next project`() {
-      val projectDir = tempDir.resolve("next-project")
-      Create().parse(arrayOf("--template", "next", "$projectDir"))
-      checkProjectStructure(projectDir)
-   }
+  @Test
+  fun `should create next project`() {
+    val projectDir = tempDir.resolve("next-project")
+    Create().parse(arrayOf("--template", "next", "$projectDir"))
+    checkProjectStructure(projectDir)
+  }
 
-   private fun checkProjectStructure(projectDir: File) {
-      val bashPath = App.config.getProperty("bash.path") ?: error("Error: Bash path not set")
+  private fun checkProjectStructure(projectDir: File) {
+    val bashPath = App.config.getProperty("bash.path") ?: error("Error: Bash path not set")
 
-      val bashProcess =
-         Runtime.getRuntime().exec(bashPath, null, projectDir).apply {
-            val command = "find . -type f -exec stat -c \"%a %n\" {} \\; | LC_ALL=C sort"
-            outputStream.use { IOUtils.write(command, it, Charsets.UTF_8) }
-            waitFor()
-         }
+    val bashProcess =
+      Runtime.getRuntime().exec(bashPath, null, projectDir).apply {
+        val command = "find . -type f -exec stat -c \"%a %n\" {} \\; | LC_ALL=C sort"
+        outputStream.use { IOUtils.write(command, it, Charsets.UTF_8) }
+        waitFor()
+      }
 
-      val expectedStructure =
-         IOUtils.resourceToString("/project-structures/${projectDir.name}.txt", Charsets.UTF_8)
-            .replace("\r\n", "\n")
-      assertEquals(expectedStructure, IOUtils.toString(bashProcess.inputStream, Charsets.UTF_8))
-   }
+    val expectedStructure =
+      IOUtils.resourceToString("/project-structures/${projectDir.name}.txt", Charsets.UTF_8)
+        .replace("\r\n", "\n")
+    assertEquals(expectedStructure, IOUtils.toString(bashProcess.inputStream, Charsets.UTF_8))
+  }
 }

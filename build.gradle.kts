@@ -28,7 +28,7 @@ kotlin {
 }
 
 spotless {
-   with(rootProject.file("spotless/copyright/kotlin.txt")) {
+   with(rootProject.file("spotless/kotlin-header.txt")) {
       kotlin {
          target("**/*.kt")
          targetExclude("**/build/**/*.kt")
@@ -44,7 +44,7 @@ spotless {
       }
    }
 
-   with(rootProject.file("spotless/config/prettierrc.json")) {
+   with(rootProject.file("spotless/prettier-config.json")) {
       json {
          target("**/*.json")
          targetExclude("**/build/**/*.json")

@@ -105,10 +105,7 @@ class Create : CliktCommand() {
 
         decodeFromString<TemplateManifest>(jsonString).run {
           echo("Generating project structure...")
-
-          binaryFiles.forEach { generateProjectFile(it) }
-          freemarkerFiles.forEach { generateProjectFile(it, preprocess = true) }
-          textFiles.forEach { generateProjectFile(it) }
+          files.forEach { generateProjectFile(it) }
         }
       }
     } catch (e: IOException) {
@@ -132,24 +129,26 @@ class Create : CliktCommand() {
     }
   }
 
-  private fun generateProjectFile(
-    templateFile: TemplateFile,
-    preprocess: Boolean = false,
-  ) {
+  private fun generateProjectFile(templateFile: TemplateFile) {
     try {
-      val outputFile = projectDir.resolve(templateFile.targetPath)
+      val outputPath =
+        templateFile.path
+          .let { if (it.startsWith("_")) "." + it.substring(1) else it }
+          .let { if (it.endsWith(".ftl")) it.substring(0, it.length - 4) else it }
 
-      with(templateCollectionDir.resolve("${projectTemplate.path}/${templateFile.sourceRoot}")) {
-        if (preprocess) {
+      val outputFile = projectDir.resolve(outputPath)
+
+      with(templateCollectionDir.resolve("${projectTemplate.path}/${templateFile.root}")) {
+        if (templateFile.path.endsWith(".ftl")) {
           freemarker.setDirectoryForTemplateLoading(this)
           FileUtils.writeStringToFile(
             outputFile,
-            freemarker.processTemplateFile(templateFile.sourcePath),
+            freemarker.processTemplateFile(templateFile.path),
             Charsets.UTF_8,
           )
         } else {
           FileUtils.copyFile(
-            resolve(templateFile.sourcePath),
+            resolve(templateFile.path),
             outputFile,
           )
         }
@@ -157,7 +156,7 @@ class Create : CliktCommand() {
 
       outputFile.setExecutable(templateFile.executable, false)
     } catch (e: FileNotFoundException) {
-      abortProjectGeneration("Error: Template file '${templateFile.sourcePath}' not found")
+      abortProjectGeneration("Error: Template file '${templateFile.path}' not found")
     }
   }
 

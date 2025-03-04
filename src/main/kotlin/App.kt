@@ -54,7 +54,7 @@ class App : CliktCommand(name = BuildConfig.NAME) {
 
   override fun help(context: Context) = "A project structure generator tool"
 
-  override fun helpEpilog(context: Context) = "Homepage: https://github.com/mayekukhisa/scaffold#readme"
+  override fun helpEpilog(context: Context) = "Homepage: https://github.com/mayekukhisa/scaffold-cli#readme"
 
   override fun run() = Unit
 

@@ -94,6 +94,7 @@ sourceSets {
 
 distributions {
   main {
+    distributionBaseName.set("${project.name}-cli")
     contents {
       from(".") {
         include("LICENSE", "NOTICE", "version.txt")

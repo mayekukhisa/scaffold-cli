@@ -88,7 +88,7 @@ This project is available under the terms of the [GPL-3.0 license][5].
 &copy; 2024 Mayeku Khisa.
 
 [1]: https://adoptium.net
-[2]: https://github.com/mayekukhisa/scaffold/releases/latest
+[2]: https://github.com/mayekukhisa/scaffold-cli/releases/latest
 [3]: https://github.com/mayekukhisa/scaffold-template-collection#installation
 [4]: https://github.com/mayekukhisa/scaffold-template-collection#available-templates
 [5]: LICENSE

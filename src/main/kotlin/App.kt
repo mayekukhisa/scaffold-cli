@@ -81,9 +81,10 @@ class App : CliktCommand(name = BuildConfig.NAME) {
     val config = Properties().apply { configFile.inputStream().use(::load) }
 
     val templates: List<Template> by lazy {
+      val templatesHomeKey = "templates.home"
       val templateCatalog =
         config
-          .getProperty("template.collection.path")
+          .getProperty(templatesHomeKey)
           ?.let {
             File(it, "catalog.json").apply {
               if (!exists()) {
@@ -96,7 +97,7 @@ class App : CliktCommand(name = BuildConfig.NAME) {
             }
           }
           ?: throw PrintMessage(
-            "Error: Template collection path not set",
+            "Error: '$templatesHomeKey' not set",
             statusCode = 1,
             printError = true,
           )

@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.2.0](https://github.com/mayekukhisa/scaffold-cli/compare/v0.1.0...v0.2.0) (2025-03-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* The configuration property `template.collection.path` is now `templates.home`.
+* Handle template file types as a single `files` list in template manifest and use a single `path` property to handle both source and target paths in project file generation. This change expects a leading '_' in template path to indicate a hidden target file/directory, and '.ftl' ending to identify a FreeMarker file for preprocessing.
+
+### Features
+
+* rename template collection path property to `templates.home` ([7283044](https://github.com/mayekukhisa/scaffold-cli/commit/728304421dcc8c548a66bb99bed3dfda92a84fba))
+* simplify template file handling and path processing ([e645489](https://github.com/mayekukhisa/scaffold-cli/commit/e645489cdb89b4f90c5dec7bff53cff16912cb4b))
+
+
+### Continuous Integration
+
+* set next release version to 0.2.0 ([c988758](https://github.com/mayekukhisa/scaffold-cli/commit/c988758850a35b71338a82a6b6dae09292cc1e35))
+
 ## [0.1.0](https://github.com/mayekukhisa/scaffold-cli/compare/v0.1.0...v0.1.0) (2024-06-10)
 
 

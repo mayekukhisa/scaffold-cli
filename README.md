@@ -1,6 +1,6 @@
-# Scaffold
+# Scaffold CLI
 
-Scaffold is a project structure generator tool that automates the setup of new projects, allowing developers to dive straight into building their applications without the hassle of initial configuration.
+**Scaffold CLI** is a project structure generator tool that automates the setup of new projects, allowing developers to dive straight into building their applications without the hassle of initial configuration.
 
 ## Key Features
 
@@ -8,17 +8,17 @@ Scaffold is a project structure generator tool that automates the setup of new p
 
 ## Getting Started
 
-This section will guide you through setting up the tool on your local machine.
+The following steps will guide you through setting up the tool on your local machine.
 
 ### System Requirements
 
-Before running this tool, ensure the following software is installed on your system:
+Ensure that the following software is installed on your system before running this tool:
 
-- JRE or JDK 17, or newer. You can download the latest version from [Adoptium][1].
+- JRE or JDK (v21.x, or newer)
 
 ### Installation
 
-1. Download the [latest release][2].
+1. Download the [latest release](https://github.com/mayekukhisa/scaffold-cli/releases/latest).
 
 2. Extract the downloaded file (.zip or .tar.gz) to your preferred location.
 
@@ -59,9 +59,9 @@ Before running this tool, ensure the following software is installed on your sys
    scaffold --version
    ```
 
-5. Follow the steps outlined [here][3] to configure your template collection.
+5. Follow the steps outlined [here](https://github.com/mayekukhisa/scaffold-templates#installation) to configure your template collection.
 
-### Generating a Project
+### Usage
 
 1. Run the following command to list all available templates:
 
@@ -69,7 +69,7 @@ Before running this tool, ensure the following software is installed on your sys
    scaffold --list-templates
    ```
 
-   You can find an overview of each template [here][4].
+   You can find an overview of each template [here](https://github.com/mayekukhisa/scaffold-templates#available-templates).
 
 2. Create a new project using the desired template with the following command:
 
@@ -83,12 +83,6 @@ Before running this tool, ensure the following software is installed on your sys
 
 ## License
 
-This project is available under the terms of the [GPL-3.0 license][5].
+This project is available under the terms of the [GPL-3.0 license](LICENSE).
 
-&copy; 2024 Mayeku Khisa.
-
-[1]: https://adoptium.net
-[2]: https://github.com/mayekukhisa/scaffold-cli/releases/latest
-[3]: https://github.com/mayekukhisa/scaffold-template-collection#installation
-[4]: https://github.com/mayekukhisa/scaffold-template-collection#available-templates
-[5]: LICENSE
+&copy; 2024-2025 Mayeku Khisa.

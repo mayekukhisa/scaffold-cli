@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/mayekukhisa/scaffold-cli/compare/v0.2.0...v0.2.1) (2025-03-25)
+
+
+### Bug Fixes
+
+* complete `templates.home` breaking change implementation ([9fe7dbf](https://github.com/mayekukhisa/scaffold-cli/commit/9fe7dbf4f2dbf1994e48570b1668c447f774f6d0))
+
 ## [0.2.0](https://github.com/mayekukhisa/scaffold-cli/compare/v0.1.0...v0.2.0) (2025-03-24)
 
 

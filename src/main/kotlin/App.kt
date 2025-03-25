@@ -81,10 +81,9 @@ class App : CliktCommand(name = BuildConfig.NAME) {
     val config = Properties().apply { configFile.inputStream().use(::load) }
 
     val templates: List<Template> by lazy {
-      val templatesHomeKey = "templates.home"
       val templateCatalog =
         config
-          .getProperty(templatesHomeKey)
+          .getProperty(Constants.TEMPLATES_HOME_KEY)
           ?.let {
             File(it, "catalog.json").apply {
               if (!exists()) {
@@ -97,7 +96,7 @@ class App : CliktCommand(name = BuildConfig.NAME) {
             }
           }
           ?: throw PrintMessage(
-            "Error: '$templatesHomeKey' not set",
+            "Error: '${Constants.TEMPLATES_HOME_KEY}' not set",
             statusCode = 1,
             printError = true,
           )

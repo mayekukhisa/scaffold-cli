@@ -30,6 +30,7 @@ import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.file
 import com.mayekukhisa.scaffold.App
 import com.mayekukhisa.scaffold.BuildConfig
+import com.mayekukhisa.scaffold.Constants
 import com.mayekukhisa.scaffold.model.TemplateFile
 import com.mayekukhisa.scaffold.model.TemplateManifest
 import kotlinx.serialization.SerializationException
@@ -78,11 +79,11 @@ class Create : CliktCommand() {
   ).file()
     .convert { File(it.canonicalPath) }
 
-  private val templateCollectionDir by lazy { File(App.config.getProperty("template.collection.path")) }
+  private val templatesHome by lazy { File(App.config.getProperty(Constants.TEMPLATES_HOME_KEY)) }
 
   private val freemarker by lazy {
     Freemarker(Freemarker.VERSION_2_3_34).apply {
-      setDirectoryForTemplateLoading(templateCollectionDir.resolve(projectTemplate.path))
+      setDirectoryForTemplateLoading(templatesHome.resolve(projectTemplate.path))
       defaultEncoding = Charsets.UTF_8.name()
       locale = Locale.US
     }
@@ -138,7 +139,7 @@ class Create : CliktCommand() {
 
       val outputFile = projectDir.resolve(outputPath)
 
-      with(templateCollectionDir.resolve("${projectTemplate.path}/${templateFile.root}")) {
+      with(templatesHome.resolve("${projectTemplate.path}/${templateFile.root}")) {
         if (templateFile.path.endsWith(".ftl")) {
           freemarker.setDirectoryForTemplateLoading(this)
           FileUtils.writeStringToFile(
